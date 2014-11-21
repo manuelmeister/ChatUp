@@ -1,24 +1,24 @@
 import socket, threading, sys
 
 class ChatServer:
-    def __init__(self, user,port=12345, host=''):
+    def __init__(self, port=12345, host=''):
         threading.Thread.__init__(self)
         self.port = port
         self.host = host
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.clients = {}
         self.threads = []
 
         try:
-            self.server.bind((self.host,self.port))
+            self.sock.bind((self.host,self.port))
         except socket.error:
             print("Failed to bind socket ",socket.error)
             sys.exit()
 
-        self.server.listen(10)
+        self.sock.listen(10)
 
     def exit(self):
-        self.server.close()
+        self.sock.close()
 
     def threadrunner(self,client,addr):
         print("Client connected with ",addr[0],":",str(addr[1]))
@@ -27,7 +27,7 @@ class ChatServer:
             data = client.recv(1024)
             if not data:
                 break
-            print(data.decode("utf-8"))
+            print(name, data.decode("utf-8"))
             client.sendall(data)
 
         client.close()
@@ -35,7 +35,7 @@ class ChatServer:
     def run(self):
         print("Waiting for connections on port",self.port)
         while True:
-            client, addr = self.server.accept()
+            client, addr = self.sock.accept()
             name = client.recv(1024)
 
             self.clients[client] = name
