@@ -21,13 +21,13 @@ class ChatServer:
         self.sock.close()
 
     def threadrunner(self,client,addr):
-        print("Client connected with ",addr[0],":",str(addr[1]))
+        name = self.clients[client]
+        print("Client",name,"connected with ",addr[0],":",str(addr[1]))
         while True:
-            name = self.clients[client]
             data = client.recv(1024)
             if not data:
                 break
-            print(name, data.decode("utf-8"))
+            print(name,":", data.decode("utf-8"))
             client.sendall(data)
 
         client.close()
@@ -36,7 +36,7 @@ class ChatServer:
         print("Waiting for connections on port",self.port)
         while True:
             client, addr = self.sock.accept()
-            name = client.recv(1024)
+            name = client.recv(1024).decode("utf-8")
 
             self.clients[client] = name
 
