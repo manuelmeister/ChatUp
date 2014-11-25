@@ -1,5 +1,6 @@
 from tkinter import *
 
+
 class ChatGui:
 
     def __init__(self):
@@ -16,10 +17,10 @@ class ChatGui:
 
     #on button click
     def submit(self):
-        return  self.txtInput.get()
+        return self.txtInput.get()
 
     def writeLine(self, strMessage):
-        self.txtChat.insert(END,strMessage + "\n")
+        self.txtChat.insert(END, strMessage + "\n")
 
 
 #main.mainloop()

@@ -7,7 +7,8 @@ class ChatClient:
         self.host = host
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.users = {}
-        self.threads = []
+
+        self.gui = gui
 
         try:
             self.sock.connect((self.host,self.port))
@@ -25,7 +26,7 @@ class ChatClient:
         data = False
         while(not data):
             data = self.sock.recv(1024)
-            print(data.decode("utf-8"))
+            self.gui.writeline(data.decode("utf-8"))
 
     def speaker(self):
         data = True
@@ -40,8 +41,7 @@ class ChatClient:
 
 
     def run(self):
-        print("Waiting for connections on port",self.port)
-        name = input("Username eingeben: ")
+        self.gui.writeline("Waiting for connections on port" + self.port)
+        name = "manuel"
         self.sock.sendall(bytes(name, "utf-8"))
-        self.threads.append(threading.Thread(target=self.listener,name='thread-listener').start())
-        self.threads.append(threading.Thread(target=self.speaker,name='thread-speaker').start())
+        threading.Thread(target=self.listener,name='thread-listener').start()
