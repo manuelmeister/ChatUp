@@ -16,7 +16,6 @@ class ChatServer:
             sys.exit()
 
         self.sock.listen(10)
-        self.run()
 
     def exit(self):
         self.sock.close()
@@ -47,3 +46,7 @@ class ChatServer:
             self.users[client] = name.decode("utf-8")
 
             threading.Thread(target=self.threadrunner, args=(client,addr)).start()
+
+if __name__ == "__main__":
+    server = ChatServer()
+    server.run()
