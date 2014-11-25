@@ -15,6 +15,8 @@ class ChatClient:
             print("Failed to bind socket ",socket.error)
             sys.exit()
 
+        self.run()
+
 
     def exit(self):
         self.sock.close()
@@ -43,8 +45,3 @@ class ChatClient:
         self.sock.sendall(bytes(name, "utf-8"))
         self.threads.append(threading.Thread(target=self.listener,name='thread-listener').start())
         self.threads.append(threading.Thread(target=self.speaker,name='thread-speaker').start())
-
-
-if __name__ == "__main__":
-    chatClient = ChatClient()
-    chatClient.run()
