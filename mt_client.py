@@ -1,7 +1,7 @@
 import socket, threading, sys
 
 class ChatClient:
-    def __init__(self, port=12345, host="localhost"):
+    def __init__(self, gui, port=12345, host="localhost"): #!!!!!
         threading.Thread.__init__(self)
         self.port = port
         self.host = host

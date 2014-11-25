@@ -1,14 +1,20 @@
 from tkinter import *
 
-def submit():
-    print("subit")
+class ChatGui:
 
-main = Tk()
-strInput = str()
-lblChat = Text(main, height=20, width=50, bg="#bbbbbb")
-lblChat.pack(side=TOP)
-txtInput = Entry(main,  width=40, textvariable=strInput)
-txtInput.pack( side = LEFT)
-cmdSubmit = Button(main, width=10, command=submit, text="Submit")
-cmdSubmit.pack(side=RIGHT)
-main.mainloop()
+    def __init__(self):
+        self.main = Tk()
+        self.main.title('ChatUp')
+        self.strInput = str()
+        self.txtChat=Text(self.main, height=20, width=50, bg="#bbbbbb")
+        self.txtChat.pack(side=TOP)
+        self.txtInput = Entry(self.main,  width=40, textvariable=self.strInput)
+        self.txtInput.pack( side = LEFT)
+        self.cmdSubmit = Button(self.main, width=10, command=self.submit, text="Submit")
+        self.cmdSubmit.pack(side=RIGHT)
+        self.main.mainloop()
+
+    def submit(self):
+        self.txtChat.insert(END,"submit\n")
+
+#main.mainloop()
