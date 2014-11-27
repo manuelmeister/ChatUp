@@ -1,5 +1,6 @@
 import socket, threading, sys
 
+
 class ChatServer:
     def __init__(self, port=12345, host="localhost"):
         threading.Thread.__init__(self)
@@ -28,12 +29,15 @@ class ChatServer:
             if not data:
                 del self.users[client]
                 break
-            print(name.decode("utf-8"),":", data.decode("utf-8"))
+            try:
+                print(name.decode("utf-8"), ":", data.decode("utf-8"))
+            except:
+                print(name,":", data.decode("utf-8"))
             for user in self.users:
                 if user == client:
                     return
                 else:
-                    user.sendall(name + b":" + data)
+                    user.sendall((name + " : " + data.decode("utf-8")).encode("utf-8"))
 
         client.close()
 

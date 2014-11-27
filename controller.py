@@ -1,9 +1,29 @@
-from mt_client import *
-from gui import *
+# from mt_client import ChatClient
+# from gui import *
+from reciever import Reciever
+from sender import Sender
+from multiprocessing.pool import ThreadPool
+from gui import ChatGui
 
-if __name__ == "__main__":
+reciever = Reciever()
+sender = Sender()
+gui = ChatGui(sender)
 
-    gui = ChatGui()
-    client = ChatClient(gui)
+while True:
+    pool = ThreadPool(processes=1)
+    reciever_result = pool.apply_async(reciever.recieve_data())
+    reciever_return_val = reciever_result.get()
+    print("recieved data")
+    print(reciever_return_val)
+    gui.writeLine(reciever_return_val)
+    #threading.Thread(target=reciever.recieve_data(), args = ()).start()
+
+
+
+
+
+
+
+
 
 

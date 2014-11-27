@@ -1,14 +1,21 @@
-import socket, threading, sys
+import socket, threading, sys, time
 
 class ChatClient:
-    def __init__(self, gui, port=12345, host="localhost"): #!!!!!
-        threading.Thread.__init__(self)
+    port = int()
+    host = ""
+    sock = socket.socket()
+    # port = port
+    # host = host
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # users = {}
+
+    def __init__(self):
+        port = 12345
+        host = "localhost"
         self.port = port
         self.host = host
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.users = {}
-
-        self.gui = gui
 
         try:
             self.sock.connect((self.host,self.port))
@@ -22,26 +29,23 @@ class ChatClient:
     def exit(self):
         self.sock.close()
 
-    def listener(self):
+    def listen(self):
         data = False
         while(not data):
             data = self.sock.recv(1024)
-            self.gui.writeline(data.decode("utf-8"))
+        return data
 
-    def speaker(self):
-        data = True
-        while (data != "exit"):
-            data = input("Ich:")
-            try:
-                # Connect to server and send data
-                self.sock.sendall(bytes(data, "utf-8"))
-            except:
-                self.sock.close()
+
+    def speak(self, message):
+        try:       # Connect to server and send data
+            self.sock.sendall(bytes(message, "utf-8"))
+        except:
+            self.sock.close()
+            print("Failed to send")
         self.sock.close()
 
 
     def run(self):
-        self.gui.writeline("Waiting for connections on port" + self.port)
         name = "manuel"
         self.sock.sendall(bytes(name, "utf-8"))
-        threading.Thread(target=self.listener,name='thread-listener').start()
+        #threading.Thread(target=self.listener,name='thread-listener').start()
