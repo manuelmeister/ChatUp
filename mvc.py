@@ -26,7 +26,11 @@ class Controller(object):
         self.tcpthread.start()
 
     def submitMessage(self, event):
-        self.model.send(self.view.txtInput.get())
+        message = self.view.txtInput.get()
+        if message == 'exit':
+            self.model.close()
+            sys.exit()
+        self.model.send(message)
         self.view.txtInput.delete(0, END)
 
     def startReceiving(self):
@@ -68,7 +72,7 @@ class View(Thread):
 
         self.app.mainloop()
 
-    def writeLine(self, strMessage, color='black', background='white'):
+    def writeLine(self, strMessage):
         self.txtChat.insert(END, strMessage + "\n")
 
 

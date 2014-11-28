@@ -1,7 +1,7 @@
 import socket, threading, sys
 
 class ChatServer:
-    def __init__(self, port=12345, host="localhost"):
+    def __init__(self, port=12345, host=""):
         threading.Thread.__init__(self)
         self.port = port
         self.host = host
@@ -24,13 +24,16 @@ class ChatServer:
         name = self.users[client]
         welcome = "User "+name+" connected on "+addr[0]+":"+str(addr[1])
         print(welcome)
-        client.sendall(welcome.encode("utf-8"))
+        for user in self.users:
+            user.sendall(welcome.encode("utf-8"))
         while True:
             try:
                 data = client.recv(1024)
                 if not data:
                     client.close()
                     del self.users[client]
+                    for user in self.users:
+                        user.sendall(bytes(name, "utf-8") + b" disconnected")
                     break
                 print(name, ":", data.decode("utf-8"))
                 for user in self.users:
