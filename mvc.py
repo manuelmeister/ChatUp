@@ -7,18 +7,25 @@ import time
 class Controller(object):
     def __init__(self):
         Thread.__init__(self)
-        self.model = Model('localhost', 12345, "manuel")
+        self.model = Model('localhost', 12345)
         self.view = View()
 
         self.view.start()
+        self.model.connect()
 
-        self.model.sendUsername()
-        self.view.cmdSubmit.bind_class("Button", "<Button-1>", self.onClick)
+        self.view.cmdSubmit.bind_class("Button", "<Button-1>", self.submitMessage)
+        self.view.cmdSubmit.bind_class("Entry", "<Return>", self.submitMessage)
 
-        tcpthread = Thread(name='tcp', target=self.startReceiving())
-        tcpthread.start()
+        self.tcpthread = Thread(name='tcp', target=self.startReceiving())
+        self.tcpthread.start()
 
-    def onClick(self, event):
+    def newInstance(self):
+        self.model = Model('localhost', 12345)
+        self.model.connect()
+        self.tcpthread = Thread(name='tcp', target=self.startReceiving())
+        self.tcpthread.start()
+
+    def submitMessage(self, event):
         self.model.send(self.view.txtInput.get())
         self.view.txtInput.delete(0, END)
 
@@ -26,6 +33,10 @@ class Controller(object):
         data_received = True
         while data_received:
             data_received = self.model.receive()
+            if data_received == b"/reconnect":
+                self.model.close()
+                self.newInstance()
+                break
             self.view.writeLine(data_received.decode("utf-8"))
             time.sleep(.5)
 
@@ -57,26 +68,24 @@ class View(Thread):
 
         self.app.mainloop()
 
-    def writeLine(self, strMessage):
+    def writeLine(self, strMessage, color='black', background='white'):
         self.txtChat.insert(END, strMessage + "\n")
 
 
 class Model(object):
-    def __init__(self, host, port, name):
+    def __init__(self, host, port):
         Thread.__init__(self)
         self.host = host
         self.port = port
-        self.conn = (host,port)
-        self.name = name
+        self.conn = (host, port)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    def sendUsername(self):
-        self.connect()
-        self.send(self.name)
-
     def connect(self):
         self.sock.connect(self.conn)
+
+    def close(self):
+        self.sock.close()
 
     def receive(self):
         data = self.sock.recv(64)

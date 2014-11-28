@@ -10,9 +10,9 @@ class ChatServer:
         self.threads = []
 
         try:
-            self.sock.bind((self.host,self.port))
+            self.sock.bind((self.host, self.port))
         except socket.error:
-            print("Failed to bind socket ",socket.error)
+            print("Failed to bind socket ", socket.error)
             sys.exit()
 
         self.sock.listen(10)
@@ -20,32 +20,45 @@ class ChatServer:
     def exit(self):
         self.sock.close()
 
-    def threadrunner(self,client,addr):
+    def threadrunner(self, client, addr):
         name = self.users[client]
-        print("Client",name,"connected with ",addr[0],":",str(addr[1]))
+        welcome = "User "+name+" connected on "+addr[0]+":"+str(addr[1])
+        print(welcome)
+        client.sendall(welcome.encode("utf-8"))
         while True:
-            data = client.recv(1024)
-            if not data:
-                del self.users[client]
-                break
-            print(name.decode("utf-8"),":", data.decode("utf-8"))
-            for user in self.users:
-                if user == client:
-                    return
-                else:
-                    user.sendall(name + b":" + data)
+            try:
+                data = client.recv(1024)
+                if not data:
+                    client.close()
+                    del self.users[client]
+                    break
+                print(name, ":", data.decode("utf-8"))
+                for user in self.users:
+                    user.sendall(bytes(name, "utf-8") + b":" + data)
+            except:
+                pass
 
         client.close()
 
     def run(self):
-        print("Waiting for connections on port",self.port)
+        print("Waiting for connections on port", self.port)
         while True:
             client, addr = self.sock.accept()
-            name = client.recv(1024)
+            client.sendall(b"Connected to Server, please type in your Username")
+            name = client.recv(1024).decode("utf-8")
 
-            self.users[client] = name.decode("utf-8")
+            username_taken = False
+            for cconnection, cname in self.users.items():
+                if cname == name:
+                    username_taken = True
 
-            threading.Thread(target=self.threadrunner, args=(client,addr)).start()
+            if username_taken:
+                client.sendall("Username nicht mehr verfügbar".encode("utf-8"))
+                client.sendall(b"/reconnect")
+                client.close()
+            else:
+                self.users[client] = name
+                threading.Thread(target=self.threadrunner, args=(client, addr)).start()
 
 if __name__ == "__main__":
     server = ChatServer()
