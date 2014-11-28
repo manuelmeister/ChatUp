@@ -74,6 +74,7 @@ class View(Thread):
 
     def writeLine(self, strMessage):
         self.txtChat.insert(END, strMessage + "\n")
+        self.txtChat.see(END)
 
 
 class Model(object):
